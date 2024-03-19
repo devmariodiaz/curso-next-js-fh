@@ -14,11 +14,12 @@ export const ActiveLink = ({ path, text } : Props) => {
 
     const pathName = usePathname();
 
-  return (
-    <Link 
-        className={`${style.link} ${(pathName === path) && style['active-link']}`}
-        href={path} >
-            {text}
-    </Link>
-  )
+    return (
+        <Link
+          className={`${style.link} ${pathName === path && style['active-link']}`}
+          href={path}
+        >
+          {text}
+        </Link>
+      );
 }
