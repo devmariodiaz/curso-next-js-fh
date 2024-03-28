@@ -8,16 +8,18 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-    const data: PokemonsResponse = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=151&offset=0`)
+    const data: PokemonsResponse = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=151`)
   .then((res) => res.json());
-
+    
   return data.results.map(pokemon => ({name: pokemon.name}))
 }
 
 export async function generateMetadata({ params }: Props) : Promise<Metadata> {
   
     try {
-      const { id, name } = await getPokemonByName(params.name);
+      const { id, name } = await getPokemon(params.name);
+      
+      console.log(name);
       return {
         title: `#${ id } - ${ name }`,
         description: `Página del Pokemon ${ name }`
@@ -31,23 +33,25 @@ export async function generateMetadata({ params }: Props) : Promise<Metadata> {
   }
   
 
-const getPokemonByName = async(name: string): Promise<Pokemon> => {
+  const getPokemon = async(name: string) : Promise<Pokemon> => {
+  
     try {
-        const pokemon = await fetch(`https://pokeapi.co/api/v2/pokemon/$´${name}`, {
-            next: {
-                revalidate: 60 * 60 * 30 * 6
-            }
-        }).then(resp => resp.json());
-
-        return pokemon;
+      const pokemon = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`, {
+        // cache: 'force-cache'
+        next: {
+          revalidate: 60 * 60 * 30 * 6
+        }
+      }).then(resp => resp.json());
+      
+      return pokemon;    
     } catch (error) {
-        return notFound();
+      return notFound();
     }
-}
+  }
 
-export default async function PokemonsByNamePage({ params } : Props) {
+export default async function PokemonsPage({ params } : Props) {
     
-    const pokemon = await getPokemonByName(params.name);
+    const pokemon = await getPokemon(params.name);
     return (
         <div className="flex mt-5 flex-col items-center text-slate-800">
           <div className="relative flex flex-col items-center rounded-[20px] w-[700px] mx-auto bg-white bg-clip-border  shadow-lg  p-3">
